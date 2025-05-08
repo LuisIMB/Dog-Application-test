@@ -11,7 +11,7 @@ import com.example.dogapp.databinding.ItemDogBinding
 
 
 class DogAdapter(
-    private val items: List<DogItem>,
+    private var items: List<DogItem>,
     private val onItemClick: (DogItem) -> Unit
 ) : RecyclerView.Adapter<DogAdapter.DogViewHolder>() {
 
@@ -37,6 +37,11 @@ class DogAdapter(
         }
     }
 
+    fun updateData(newList: List<DogItem>) {
+        items = newList
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DogViewHolder {
         val binding = ItemDogBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return DogViewHolder(binding)
@@ -46,5 +51,8 @@ class DogAdapter(
         holder.bind(items[position])
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return super.getItemViewType(position)
+    }
     override fun getItemCount(): Int = items.size
 }

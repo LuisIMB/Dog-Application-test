@@ -171,5 +171,34 @@ class DogDatabaseHelper(context: Context) :
 
         return images
     }
+
+    fun getBreedAndSubBreedByImageUrl(imageUrl: String): List<String> {
+        val db = readableDatabase
+        val result = mutableListOf<String>()
+
+        val query = """
+        SELECT b.$COLUMN_BREED_NAME, s.$COLUMN_SUBBREED_NAME
+        FROM $TABLE_IMAGES i
+        JOIN $TABLE_BREEDS b ON i.$COLUMN_IMAGE_BREED_ID = b.$COLUMN_BREED_ID
+        LEFT JOIN $TABLE_SUBBREEDS s ON i.$COLUMN_IMAGE_SUBBREED_ID = s.$COLUMN_SUBBREED_ID
+        WHERE i.$COLUMN_IMAGE_URL = ?
+    """
+
+        val cursor = db.rawQuery(query, arrayOf(imageUrl))
+
+        if (cursor.moveToFirst()) {
+            val breed = cursor.getString(0)
+            val subBreed = cursor.getString(1)
+            result.add(breed)
+            if (!subBreed.isNullOrEmpty()) {
+                result.add(subBreed)
+            }
+        }
+
+        cursor.close()
+        db.close()
+        return result
+    }
+
 }
 

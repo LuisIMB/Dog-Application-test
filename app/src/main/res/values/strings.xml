@@ -2,4 +2,9 @@
     <string name="app_name">dogApp</string>
     <string name="dog_image">Dog image</string>
     <string name="breed_name">Breed Name</string>
+    <string name="show_random_image">Show Random Image</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_random_image_detail">RandomImageDetailActivity</string>
+    <string name="dog_name">Dog Name</string>
 </resources>

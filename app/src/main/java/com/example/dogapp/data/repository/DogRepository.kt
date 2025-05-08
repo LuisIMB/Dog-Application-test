@@ -7,6 +7,7 @@ import com.example.dogapp.data.model.DogItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.util.Log
+import com.example.dogapp.data.model.ImageResponse
 
 class DogRepository(
     private val context: Context,
@@ -55,6 +56,12 @@ class DogRepository(
 
     fun getAllDogItems(): List<DogItem> {
         return dbHelper.getAllDogItems()
+    }
+
+    suspend fun fetchRandomDogImage(): String {
+        println("entrando a buscar random image")
+        val response = apiService.getRandomImage()
+        return response.message
     }
 
     fun getImagesForBreed(breed: String, subBreed: String?): List<String> {
