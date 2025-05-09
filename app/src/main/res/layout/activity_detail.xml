@@ -14,4 +14,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <NumberPicker
+        android:id="@+id/DogRandomNumberPicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/dog_number_picker"
+        app:layout_constraintBottom_toBottomOf="@+id/viewPager"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

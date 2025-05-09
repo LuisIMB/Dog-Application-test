@@ -7,4 +7,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_random_image_detail">RandomImageDetailActivity</string>
     <string name="dog_name">Dog Name</string>
+    <string name="spinner_prompt">Choose a breed</string>
+    <string name="dog_number_picker">Dog Number Picker</string>
+    <string name="random_dog_image">Random dog image</string>
+
 </resources>

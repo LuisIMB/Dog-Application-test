@@ -6,6 +6,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.dogapp.databinding.ActivityDetailBinding
+import com.example.dogapp.ui.activity.RandomImagesBreedDetailActivity.Companion.INTENT_NUMBER
+import com.example.dogapp.ui.adapter.DogImageGridAdapter
 import com.example.dogapp.ui.adapter.ImagePagerAdapter
 import com.example.dogapp.viewmodel.DetailViewModel
 import com.example.dogapp.viewmodel.MainViewModel
@@ -14,6 +16,8 @@ class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
     private lateinit var viewModel: DetailViewModel
+    private lateinit var dogGridAdapter: DogImageGridAdapter
+
     companion object {
         const val INTENT_BREED = "intent_breed"
         const val INTENT_SUBBREED = "intent_subbreed"
@@ -41,6 +45,21 @@ class DetailActivity : AppCompatActivity() {
             binding.viewPager.isUserInputEnabled = imageUrls.size > 1
 
         }
+
+        val numberPicker = binding.DogRandomNumberPicker
+        numberPicker.minValue = 2
+        numberPicker.maxValue = 10
+        numberPicker.value = 2
+
+        numberPicker.setOnValueChangedListener { _, _, newVal ->
+            // Navigate to another screen or process the number
+            val intent = Intent(this, RandomImagesBreedDetailActivity::class.java)
+            intent.putExtra(INTENT_NUMBER, newVal)
+            intent.putExtra(INTENT_BREED, breed)
+            intent.putExtra(INTENT_SUBBREED, subBreed)
+            startActivity(intent)
+        }
+
 
     }
 

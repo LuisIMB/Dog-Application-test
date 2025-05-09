@@ -29,6 +29,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.DetailActivity" />
+        <activity android:name=".ui.activity.RandomImagesBreedDetailActivity" />
+
     </application>
 
 </manifest>

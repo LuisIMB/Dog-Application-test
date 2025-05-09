@@ -63,8 +63,24 @@ class DogRepository(
         val response = apiService.getRandomImage()
         return response.message
     }
+    suspend fun fetchRandomDogImagesForBreed(breed: String, subBreed: String?, amount: Int): List<String> {
+        println("entrando a buscar random images")
+        if (subBreed != null) {
+            val response = apiService.getRandomImages(breed, subBreed, amount)
+            return response.message
+        }
+        else {
+            val response = apiService.getRandomImages(breed, amount)
+            return response.message
+        }
+    }
 
     fun getImagesForBreed(breed: String, subBreed: String?): List<String> {
         return dbHelper.getImagesForBreed(breed, subBreed)
     }
+
+    fun getBreedAndSubBreedByImageUrl(imageUrl: String): List<String> {
+        return dbHelper.getBreedAndSubBreedByImageUrl(imageUrl)
+    }
+
 }
