@@ -51,14 +51,23 @@ class DetailActivity : AppCompatActivity() {
         numberPicker.maxValue = 10
         numberPicker.value = 2
 
-        numberPicker.setOnValueChangedListener { _, _, newVal ->
+       /* numberPicker.setOnValueChangedListener { _, _, newVal ->
             // Navigate to another screen or process the number
             val intent = Intent(this, RandomImagesBreedDetailActivity::class.java)
             intent.putExtra(INTENT_NUMBER, newVal)
             intent.putExtra(INTENT_BREED, breed)
             intent.putExtra(INTENT_SUBBREED, subBreed)
             startActivity(intent)
+        }*/
+        numberPicker.setOnClickListener {
+            val selectedValue = numberPicker.value
+            val intent = Intent(this, RandomImagesBreedDetailActivity::class.java)
+            intent.putExtra(INTENT_NUMBER, selectedValue)
+            intent.putExtra(INTENT_BREED, breed)
+            intent.putExtra(INTENT_SUBBREED, subBreed)
+            startActivity(intent)
         }
+
 
 
     }

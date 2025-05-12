@@ -36,6 +36,8 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[MainViewModel::class]
         setContentView(binding.root)
         binding.dogRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.dogSelectRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
 
         viewModel.filteredDogs.observe(this) { dogList ->
             adapter = DogAdapter(dogList) { item ->

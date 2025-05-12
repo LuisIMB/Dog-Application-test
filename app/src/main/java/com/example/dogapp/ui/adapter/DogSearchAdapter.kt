@@ -1,11 +1,10 @@
 package com.example.dogapp.ui.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.example.dogapp.data.model.DogItem
+import com.example.dogapp.R
 import com.example.dogapp.databinding.ItemNameBinding
 
 
@@ -15,13 +14,42 @@ class DogSearchAdapter(
     private val onItemClick: (String) -> Unit
 ) : RecyclerView.Adapter<DogSearchAdapter.DogViewHolder>() {
 
+    private var selectedPosition = RecyclerView.NO_POSITION
+
     inner class DogViewHolder(val binding: ItemNameBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: String) {
+        fun bind(item: String, isSelected: Boolean) {
             val displayName = item.replaceFirstChar { it.uppercaseChar() }
 
             binding.textViewBreed.text = displayName
+
+            //binding.root.setBackgroundDrawable(R.drawable.dog_search_selected)
+/*            binding.root.setBackgroundColor(
+                if (isSelected) Color.RED else Color.TRANSPARENT
+            )*/
+            val context = binding.root.context
+            val drawableRes = if (isSelected) {
+                R.drawable.dog_search_selected
+            } else {
+                R.drawable.dog_search_unselected
+            }
+            binding.root.background = ContextCompat.getDrawable(context, drawableRes)
+
             binding.root.setOnClickListener {
-                onItemClick(item)
+                val previousPosition = selectedPosition
+
+                if (adapterPosition == selectedPosition) {
+                    // Deselect if clicked again
+                    selectedPosition = RecyclerView.NO_POSITION
+                    notifyItemChanged(previousPosition)
+                    onItemClick(" ")
+                } else {
+                    // Select new item
+                    selectedPosition = adapterPosition
+                    notifyItemChanged(previousPosition)
+                    notifyItemChanged(selectedPosition)
+                    onItemClick(item)
+                }
+
             }
         }
     }
@@ -32,7 +60,7 @@ class DogSearchAdapter(
     }
 
     override fun onBindViewHolder(holder: DogViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], position==selectedPosition)
     }
 
     override fun getItemViewType(position: Int): Int {
