@@ -66,10 +66,13 @@ class DogRepository(
     suspend fun fetchRandomDogImagesForBreed(breed: String, subBreed: String?, amount: Int): List<String> {
         println("entrando a buscar random images")
         if (subBreed != null) {
+            println("Si el subbreed no es null")
+            println(subBreed)
             val response = apiService.getRandomImages(breed, subBreed, amount)
             return response.message
         }
         else {
+            println("Solo breed")
             val response = apiService.getRandomImages(breed, amount)
             return response.message
         }

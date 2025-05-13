@@ -18,46 +18,73 @@ import com.example.dogapp.viewmodel.MainViewModel
 import androidx.appcompat.widget.SearchView
 import com.example.dogapp.ui.adapter.DogSpinnerAdapter
 import android.widget.AdapterView
-import com.example.dogapp.ui.adapter.DogSearchAdapter
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: DogAdapter
-    private lateinit var searchAdapter: DogSearchAdapter
     private lateinit var viewModel: MainViewModel
+
+    companion object {
+        private const val DOG_NAME = "dog_name"
+        private const val SELECTED_DOG_NAME = "selected_dog_name"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportActionBar?.title = "Dog collection"
+        println("onCreate of mainActivity executed")
 
+        supportActionBar?.title = "Dog collection"
+        //Basic initialization steps
         binding = ActivityMainBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this)[MainViewModel::class]
         setContentView(binding.root)
         binding.dogRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.dogSelectRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-
-        viewModel.filteredDogs.observe(this) { dogList ->
-            adapter = DogAdapter(dogList) { item ->
+        //Dog adapter set up
+        adapter = DogAdapter(
+            emptyList(),
+            emptyList(),
+            onDogItemClick = { item ->
                 val intent = Intent(this, DetailActivity::class.java).apply {
                     putExtra(DetailActivity.INTENT_BREED, item.breed)
                     putExtra(DetailActivity.INTENT_SUBBREED, item.subBreed)
-                    //startActivity(this) otra posibilidad
                 }
                 val responseCode = if (item.subBreed != null) {
                     DetailActivity.RESPONSE_SUBBREED
                 } else {
                     DetailActivity.RESPONSE_BREED
                 }
-
                 startActivityForResult(intent, responseCode)
+            },
+            onNameClick = { selectedName ->
+                viewModel.setSelectedDogName(selectedName)
+                viewModel.filterDogs(selectedName)
             }
-            binding.dogRecyclerView.adapter = adapter
+        )
+        //Prepare the components that use the adapter
+        binding.dogRecyclerView.adapter = adapter
+        binding.dogRecyclerView.post {
+            adapter.restoreScrollPosition(viewModel.savedScrollPosition)
         }
 
-        // Spinner setup
+        viewModel.filteredDogs.observe(this) { dogList ->
+            val dogNames = viewModel.spinnerList.value.orEmpty()
+            adapter.updateData(dogList, dogNames)
+        }
+
+        viewModel.spinnerList.observe(this) { newNames ->
+            val dogList = viewModel.filteredDogs.value.orEmpty()
+            adapter.updateData(dogList, newNames)
+        }
+
+        val restoredName = savedInstanceState?.getString(SELECTED_DOG_NAME)
+        restoredName?.let {
+            viewModel.filterDogs(it)
+            adapter.setSelectedDogName(it)
+        }
+        //Spinner set up
         viewModel.spinnerList.observe(this) { dogStrings ->
             val spinnerAdapter = DogSpinnerAdapter(this, listOf("Select a breed") + dogStrings)
             binding.spinnerDogList.adapter = spinnerAdapter
@@ -66,12 +93,11 @@ class MainActivity : AppCompatActivity() {
             binding.spinnerDogList.adapter = spinnerAdapter
         }
 
-        // Spinner item click
         binding.spinnerDogList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>, view: android.view.View?, position: Int, id: Long
             ) {
-                if (position == 0) return // Skip placeholder item
+                if (position == 0) return
 
                 val selectedText = parent.getItemAtPosition(position) as String
                 val parts = selectedText.split(" ")
@@ -97,12 +123,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
-                // No action needed
             }
         }
 
 
-
+        //Random image button + image combo
         viewModel.randomDogImage.observe(this) { dogImage ->
             Glide.with(this)
                 .load(dogImage)
@@ -120,6 +145,8 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
+        //Search view (barra de búsqueda) set up
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
@@ -130,19 +157,25 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         })
-
-        viewModel.spinnerList.observe(this) { nameList ->
-            searchAdapter = DogSearchAdapter(nameList) { item ->
-                viewModel.filterDogs(item)
-            }
-            binding.dogSelectRecyclerView.adapter = searchAdapter
+        //Selected dog name update (used to remember last selected dog for screen rotation)
+        viewModel.selectedDogName.observe(this) { selectedName ->
+            adapter.setSelectedDogName(selectedName.orEmpty())
         }
+
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        println("Entered onsaveinstancestate")
+        viewModel.savedScrollPosition = adapter.saveScrollPosition()
+        outState.putString(SELECTED_DOG_NAME, viewModel.selectedDogName.value)
+    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            val dogName = data?.getStringExtra("dog_name")
+            val dogName = data?.getStringExtra(DOG_NAME)
             when (requestCode) {
                 DetailActivity.RESPONSE_BREED -> {
                     Toast.makeText(this, "You viewed breed: $dogName", Toast.LENGTH_SHORT).show()

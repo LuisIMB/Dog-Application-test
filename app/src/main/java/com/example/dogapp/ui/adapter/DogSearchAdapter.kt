@@ -7,8 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dogapp.R
 import com.example.dogapp.databinding.ItemNameBinding
 
-
-
 class DogSearchAdapter(
     private var items: List<String>,
     private val onItemClick: (String) -> Unit
@@ -17,15 +15,13 @@ class DogSearchAdapter(
     private var selectedPosition = RecyclerView.NO_POSITION
 
     inner class DogViewHolder(val binding: ItemNameBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: String, isSelected: Boolean) {
-            val displayName = item.replaceFirstChar { it.uppercaseChar() }
+        fun bind(item: String) {
+            val position = bindingAdapterPosition
+            val isSelected = position == selectedPosition
 
+            val displayName = item.replaceFirstChar { it.uppercaseChar() }
             binding.textViewBreed.text = displayName
 
-            //binding.root.setBackgroundDrawable(R.drawable.dog_search_selected)
-/*            binding.root.setBackgroundColor(
-                if (isSelected) Color.RED else Color.TRANSPARENT
-            )*/
             val context = binding.root.context
             val drawableRes = if (isSelected) {
                 R.drawable.dog_search_selected
@@ -35,22 +31,23 @@ class DogSearchAdapter(
             binding.root.background = ContextCompat.getDrawable(context, drawableRes)
 
             binding.root.setOnClickListener {
-                val previousPosition = selectedPosition
+                val clickedPosition = bindingAdapterPosition
+                if (clickedPosition == RecyclerView.NO_POSITION) return@setOnClickListener
 
-                if (adapterPosition == selectedPosition) {
-                    // Deselect if clicked again
+                val prevSelected = selectedPosition
+
+                if (clickedPosition == selectedPosition) {
                     selectedPosition = RecyclerView.NO_POSITION
-                    notifyItemChanged(previousPosition)
+                    notifyItemChanged(prevSelected)
                     onItemClick(" ")
                 } else {
-                    // Select new item
-                    selectedPosition = adapterPosition
-                    notifyItemChanged(previousPosition)
+                    selectedPosition = clickedPosition
+                    notifyItemChanged(prevSelected)
                     notifyItemChanged(selectedPosition)
                     onItemClick(item)
                 }
-
             }
+            println("Bind: $displayName, selected=$isSelected, position=$position, selectedPosition=$selectedPosition")
         }
     }
 
@@ -60,11 +57,26 @@ class DogSearchAdapter(
     }
 
     override fun onBindViewHolder(holder: DogViewHolder, position: Int) {
-        holder.bind(items[position], position==selectedPosition)
+        holder.bind(items[position])
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return super.getItemViewType(position)
-    }
     override fun getItemCount(): Int = items.size
+
+    fun updateItems(newItems: List<String>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
+
+    fun setSelectedDogName(name: String) {
+        println("Entered setSelectedDogName with $name")
+        val newPosition = items.indexOf(name)
+        if (newPosition != selectedPosition) {
+            val prev = selectedPosition
+            selectedPosition = newPosition
+            if (prev != RecyclerView.NO_POSITION) notifyItemChanged(prev)
+            if (newPosition != RecyclerView.NO_POSITION) notifyItemChanged(newPosition)
+        }
+    }
+
+
 }

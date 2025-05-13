@@ -43,8 +43,8 @@ class RandomImagesBreedDetailActivity : AppCompatActivity() {
             }
             binding.imageGridRecyclerView.adapter = dogGridAdapter
         }
-
-        viewModel.fetchRandomImages(breed!!, subBreed, number)
+        if (!viewModel.randomImages.isInitialized) //evitar que se regeneren al rotar pantalla
+            viewModel.fetchRandomImages(breed!!, subBreed, number)
 
         viewModel.randomImages.observe(this) { imageUrls ->
             val adapter = ImagePagerAdapter(imageUrls)

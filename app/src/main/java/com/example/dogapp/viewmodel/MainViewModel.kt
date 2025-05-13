@@ -27,6 +27,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _selectedDogName = MutableLiveData<String?>()
+    val selectedDogName: LiveData<String?> = _selectedDogName
+
+    var savedScrollPosition : Int = 0
+
+
+
     init {
         loadDogData()
     }
@@ -62,7 +69,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun filterDogs(query: String) {
         val currentList = _dogItems.value.orEmpty()
-        val lowerQuery = query.trim().lowercase()
+        var lowerQuery = query.trim().lowercase()
+        val test = _selectedDogName.value
+        println("_selectedDogName: $test and query: $query")
+        if (_selectedDogName.value.orEmpty().isNotBlank() && _selectedDogName.value != lowerQuery) //TODO mirar si va bien
+            lowerQuery = _selectedDogName.value!!
 
         val filtered = if (" " in lowerQuery) {
             val parts = lowerQuery.split(" ", limit = 2)
@@ -86,7 +97,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _filteredDogs.value = filtered
     }
 
-
+    fun setSelectedDogName(name: String?) {
+        _selectedDogName.value = name
+    }
 
 
 }

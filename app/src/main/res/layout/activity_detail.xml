@@ -10,15 +10,16 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/DogRandomNumberPicker"/>
 
     <NumberPicker
         android:id="@+id/DogRandomNumberPicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:contentDescription="@string/dog_number_picker"
-        app:layout_constraintBottom_toBottomOf="@+id/viewPager"/>
+        app:layout_constraintTop_toBottomOf="@id/viewPager"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
